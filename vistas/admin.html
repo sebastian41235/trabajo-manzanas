@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador</title>
+</head>
+<body>
+    <h1>Bienvenido Administrador: <span id="admin" ></span></h1>
+    <h1>Usuario</h1>
+    <div id="contenedor_servicios">
+        <form id="formularioSeleccionServicio" >
+     <ul id="lista-servicios"></ul>
+
+</form>
+</div>  
+<input id="mostrarsoli" type="button" value="Mostrar solicitudes" class="bg-blue-400 text-white px-4 py-2 rounded-lg mb-2 w-full">
+    
+    <!-- Lista de solicitudes -->
+    
+        <ul id="solicitudes" class="mb-4"></ul>
+        <input id="eliminar" type="button" value="Eliminar">
+    
+    <script>
+        document.addEventListener('DOMContentLoaded',()=>{
+            const xhrUsuario = new XMLHttpRequest();
+            xhrUsuario.open('POST','/obtener-usuarios',true);
+            xhrUsuario.onreadystatechange=function(){
+                if(xhrUsuario.readyState===4){
+                    if(xhrUsuario.status === 200){
+                        const usuario = JSON.parse(xhrUsuario.response);
+                        document.getElementById('admin').textContent=usuario.nombre
+                    }
+                    else{
+                        console.error('Error al obtener usuario')
+                    }
+                }
+            };
+            xhrUsuario.send();
+
+            const contenedor_servicios = document.getElementById('contenedor_servicios');
+            const form_servi = document.getElementById('form_servi');
+            const s_disponibles = document.getElementById('s_disponibles');
+            const mostrarservi = document.getElementById('mostrarservi');
+            const solicitudes = document.getElementById('solicitudes');
+            const listaservicios = document.getElementById('lista-servicios');
+            const eliminarsolixd = document.getElementById('eliminarsolixd'); 
+            const cerrarse = document.getElementById('cerrarse')
+
+            
+            mostrarservi.addEventListener('click', () => {
+                const xhrmoss = new XMLHttpRequest();
+                xhrmoss.open('POST', '/solicitudes-usuario', true);
+                xhrmoss.setRequestHeader('Content-type', 'application/json');
+                xhrmoss.onreadystatechange = function() {
+                    if (xhrmoss.readyState === 4) {
+                        if (xhrmoss.status === 200) {
+                            const data = JSON.parse(xhrmoss.responseText);
+                            solicitudes.innerHTML = data.solicitud.map((solicitud) => `
+                                <li><input type="checkbox" value="${solicitud}">${solicitud[0]}<p>-</p>${solicitud[1]}</li>
+                            `).join('');
+                        } else {
+                            console.error('Error al entrar al servidor');
+                        }
+                    }
+                };
+                xhrmoss.send(JSON.stringify());
+            });
+
+            eliminarsolixd.addEventListener('click', async (event) => {
+                event.preventDefault();
+                const solicitudesxd = Array.from(solicitudes.querySelectorAll('li input[type="checkbox"]'))
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+                const xhreliso = new XMLHttpRequest();
+                xhreliso.open('POST', '/eliminar-solicitudes', true);
+                xhreliso.setRequestHeader('Content-type', 'application/json');
+                xhreliso.onreadystatechange = function() {
+                    if (xhreliso.readyState === 4) {
+                        if (xhreliso.status === 200) {
+                            console.log('Solicitud eliminada');
+                        } else {
+                            console.error('Error al borrar solicitud');
+                        }
+                    }
+                };
+                xhreliso.send(JSON.stringify({solicitud: solicitudesxd }));
+            });
+       
+        });
+    </script>
+</body>
+</html>

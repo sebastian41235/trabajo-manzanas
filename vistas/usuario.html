@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuario</title>
+    <!-- Importar la biblioteca Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white flex flex-col justify-center items-center h-screen">
+    <!-- Título de bienvenida -->
+    <h1 class="text-center text-2xl font-bold mb-4">Hola, <span id="nusuario" class="font-normal"></span></h1>
+    
+    <!-- Botón para mostrar servicios disponibles -->
+    <button id="s_disponibles" class="rounded-lg bg-blue-400 text-white px-4 py-2 mb-4 w-full">Servicios disponibles</button>
+
+    <!-- Contenedor para los servicios -->
+    <div id="contenedor_servicios">
+        <form id="form_servi" class="bg-white p-8 rounded-lg shadow-md">
+            <ul id="lista-servicios" class="mb-4"></ul>
+            <!-- Selector de fecha y hora -->
+            <input type="datetime-local" id="fechahora" name="fechahora" class="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md opacity-90">
+            <!-- Botón para guardar servicios seleccionados -->
+            <button type="submit" class="bg-blue-400 text-white px-4 py-2 rounded-lg mb-2 w-full">Guardar</button>
+        </form>
+    </div>
+    
+    <!-- Botón para mostrar solicitudes -->
+    <input id="mostrarsoli" type="button" value="Mostrar solicitudes" class="bg-blue-400 text-white px-4 py-2 rounded-lg mb-2 w-full">
+    
+    <!-- Lista de solicitudes -->
+    
+        <ul id="solicitudes" class="mb-4"></ul>
+    
+    
+    <!-- Botón para eliminar solicitudes -->
+    
+    <input id="eliminarsolixd" type="button" value="Eliminar solicitudes" class="bg-red-400 text-white px-4 py-2 rounded-lg w-full">
+
+    <input id="cerrarse" type="button" value="Cerrar sesión">
+    <!-- Script para manejar la lógica del cliente -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const xhrUsuario = new XMLHttpRequest();
+            xhrUsuario.open('POST','/obtener-usuarios',true);
+            xhrUsuario.onreadystatechange=function(){
+                if(xhrUsuario.readyState===4){
+                    if(xhrUsuario.status === 200){
+                        const usuario = JSON.parse(xhrUsuario.response);
+                        document.getElementById('nusuario').textContent=usuario.nombre
+                    }
+                    else{
+                        console.error('Error al obtener usuario')
+                    }
+                }
+            };
+            xhrUsuario.send();
+           
+            const contenedor_servicios = document.getElementById('contenedor_servicios');
+            const form_servi = document.getElementById('form_servi');
+            const s_disponibles = document.getElementById('s_disponibles');
+            const mostrarsoli = document.getElementById('mostrarsoli');
+            const solicitudes = document.getElementById('solicitudes');
+            const listaservicios = document.getElementById('lista-servicios');
+            const eliminarsolixd = document.getElementById('eliminarsolixd'); 
+            const cerrarse = document.getElementById('cerrarse')
+
+            // Manejador de eventos para mostrar servicios disponibles
+            s_disponibles.addEventListener('click', () => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/obtener-servicios-usuario', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            const data = JSON.parse(xhr.responseText);
+                            listaservicios.innerHTML = data.servicios.map(servicios => `
+                                <li><label><input type="checkbox" name="servicios" value="${servicios}">${servicios}</label></li>
+                            `).join('');
+                        } 
+                        else {
+                            console.error('Error al obtener servicios');
+                        }
+                    }
+                };
+                xhr.send(JSON.stringify());
+            });
+
+            // Manejador de eventos para guardar servicios seleccionados
+            form_servi.addEventListener('submit', async () => {
+                event.preventDefault();
+                const servicioselec = Array.from(form_servi.elements['servicios'])
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+                const fechahora = form_servi.elements['fechahora'].value;
+                const xhrguardado = new XMLHttpRequest();
+                xhrguardado.open('POST', '/guardar-servicios-usuario', true);
+                xhrguardado.setRequestHeader('Content-Type', 'application/json');
+                xhrguardado.onreadystatechange = function() {
+                    if (xhrguardado.readyState === 4) {
+                        if (xhrguardado.status === 200) {
+                            alert("Datos guardados");
+                        } else {
+                            console.error('Error al guardar servicios del usuario');
+                        }
+                    }
+                };
+                xhrguardado.send(JSON.stringify({
+                    servicios: servicioselec,
+                    fechahora: fechahora
+                }));
+            });
+            
+            // Manejador de eventos para mostrar solicitudes
+            mostrarsoli.addEventListener('click', () => {
+                const xhrmos = new XMLHttpRequest();
+                xhrmos.open('POST', '/solicitudes-usuario', true);
+                xhrmos.setRequestHeader('Content-type', 'application/json');
+                xhrmos.onreadystatechange = function() {
+                    if (xhrmos.readyState === 4) {
+                        if (xhrmos.status === 200) {
+                            const data = JSON.parse(xhrmos.responseText);
+                            solicitudes.innerHTML = data.solicitud.map((solicitud) => `
+                                <li><input type="checkbox" value="${solicitud}">${solicitud[0]}<p>-</p>${solicitud[1]}</li>
+                            `).join('');
+                        } else {
+                            console.error('Error al entrar al servidor');
+                        }
+                    }
+                };
+                xhrmos.send(JSON.stringify());
+            }); 
+
+            // Manejador de eventos para eliminar solicitudes
+            eliminarsolixd.addEventListener('click', async (event) => {
+                event.preventDefault();
+                const solicitudesxd = Array.from(solicitudes.querySelectorAll('li input[type="checkbox"]'))
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+                const xhreliso = new XMLHttpRequest();
+                xhreliso.open('POST', '/eliminar-solicitudes', true);
+                xhreliso.setRequestHeader('Content-type', 'application/json');
+                xhreliso.onreadystatechange = function() {
+                    if (xhreliso.readyState === 4) {
+                        if (xhreliso.status === 200) {
+                            console.log('Solicitud eliminada');
+                        } else {
+                            console.error('Error al borrar solicitud');
+                        }
+                    }
+                };
+                xhreliso.send(JSON.stringify({solicitud: solicitudesxd }));
+            });
+            cerrarse.addEventListener('click',()=>{
+                const xhrcerrar = new XMLHttpRequest();
+                xhrcerrar.open('POST','/cerrar-usuario', true);
+                xhrcerrar.onreadystatechange = function(){
+                    if(xhrcerrar.readyState === 4){
+                        if(xhrcerrar.status === 200){
+                            window.location.href = 'http://127.0.0.1:5501/vistas/index.html'
+                            console.log('cerrar sesion')
+                        }
+                        else{
+                            console.error('Error al cerrar sesion')
+                        }
+                    }
+                }
+                xhrcerrar.send()
+            })
+            window.onload=function(){
+                window.history.forward()
+            }
+            window.onpageshow=function(event){
+                if(event.persisted){
+                    window.location.rreload();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

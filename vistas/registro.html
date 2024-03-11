@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="estilos/style.css">
+    <title>Registro</title>
+</head>
+<body>
+    <main>
+        <section id="Reg">
+            <h1 class="regi">Registro de datos</h1>
+            <form  class="formul" action="http://localhost:3000/crear" method="POST">
+                <div id="name">
+                    <label id="name" for="">Nombre</label>
+                    <input class="name" name="Nombre" type="text" required>
+                </div>
+                <div id="doxu">
+                    <label id="doxu" for="">Tipo de documento</label>
+                    <select class="doxu" name="Tipo_documento" required>
+                        <option>Cedula de Ciudadania</option>
+                        <option selected>Tarjeta de Identidad</option>
+                        <option>Cedula Extranjera</option>
+                        <option>Documento Extranjero</option>
+                        <option>Pasaporte</option>
+                        <option>Registro Civil</option>
+                    </select>
+                </div>
+
+                <label for="id_M1">manzana</label>
+                  <select name="id_M1" id="TD">
+                    <option value=1>Bosa</option>
+                    <option value=2>Suba</option>
+                    <option value=3>Chapinero</option>
+                </select>
+
+                <div id="dox">
+                    <label class="dox" for="">Documento</label>
+                    <input class="dox" name="Documento" type="tel" maxlength="15" required>
+                </div>
+                <div id="butn">
+                    <a href="#"><input class="botunos" type="submit" value="Enviar"></a>
+                    <a href="index.html"><input class="regbo" type="button" value="Atras"></a>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

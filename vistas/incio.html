@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="estilos/style.css">
+</head>
+<body>
+    <h1 id="titulo">Ingrese sus datos</h1>
+    <form class="dondeponerxd" action="http://localhost:3000/Iniciar" method="POST">
+        <label id="tipo_documento" for="tipo_documento">Tipo de documento: </label>
+        <select class="tipo_documento" name="tipo_documento" id="tipo_documento">
+            <option>Cédula de Ciudadanía</option>
+            <option >Tarjeta de Identidad</option>
+            <option>Cedula Extranjera</option>
+            <option>Documento Extranjero</option>
+            <option>Pasaporte</option>
+            <option>Registro Civil</option>
+        </select>
+        <label id="docto">Documento: </label> 
+        <input class="docto" name="documento" type="tel" id="numero_documento">
+
+        <input class="botones" type="submit" value="Iniciar sesion">
+        <a href="index.html"><input class="botones-2" type="button" value="Atras"></a>
+    </form>
+</body>
+</html>
